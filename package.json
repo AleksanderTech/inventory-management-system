@@ -1,0 +1,16 @@
+{
+  "name": "inventory-management-system",
+  "version": "1.0.0",
+  "description": "Inventory Management System",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AleksanderTech/inventory-management-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AleksanderTech/inventory-management-system/issues"
+  },
+  "homepage": "https://github.com/AleksanderTech/inventory-management-system#readme"
+}
