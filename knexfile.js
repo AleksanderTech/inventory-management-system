@@ -21,4 +21,24 @@ export default {
     },
     useNullAsDefault: true,
   }),
+  test: ({ filename } = {}) => ({
+    client: "better-sqlite3",
+    connection: {
+      filename: filename || ":memory:",
+    },
+    migrations: {
+      stub: path.join(RootDir, "db", "migrations", "stub", "migration.stub.js"),
+    },
+    pool: {
+      min: 1,
+      max: 1,
+      afterCreate: (conn, done) => {
+        conn.pragma("foreign_keys = ON");
+        conn.pragma("busy_timeout = 5000");
+        conn.pragma("journal_mode = WAL");
+        done(null, conn);
+      },
+    },
+    useNullAsDefault: true,
+  }),
 };
