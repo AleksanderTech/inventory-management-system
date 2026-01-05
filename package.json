@@ -5,8 +5,11 @@
   "main": "src/app/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "node --watch-path=./src ./src/app/index.ts",
-    "start": "node ./src/app/index.ts"
+    "dev": "node --env-file=.env.development --watch-path=./src ./src/app/index.ts",
+    "start": "npm run migrate-up && node --env-file=.env.development ./src/app/index.ts",
+    "migrate-up": "npx knex migrate:latest --knexfile ./knexfile-cli.js --migrations-directory db/migrations",
+    "migrate-down": "npx knex migrate:down --knexfile ./knexfile-cli.js --migrations-directory db/migrations",
+    "make-migration": "npx knex migrate:make --knexfile ./knexfile-cli.js --migrations-directory db/migrations"
   },
   "repository": {
     "type": "git",
