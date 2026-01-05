@@ -2,7 +2,7 @@
   "name": "inventory-management-system",
   "version": "1.0.0",
   "description": "Inventory Management System",
-  "main": "index.js",
+  "main": "src/app/index.ts",
   "type": "module",
   "scripts": {
     "dev": "node --watch-path=./src ./src/app/index.ts",
@@ -17,7 +17,10 @@
   },
   "homepage": "https://github.com/AleksanderTech/inventory-management-system#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "better-sqlite3": "^12.5.0",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "knex": "^3.1.0"
   },
   "devDependencies": {
     "@types/express": "^5.0.6"
