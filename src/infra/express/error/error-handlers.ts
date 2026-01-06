@@ -5,8 +5,9 @@ import type { ApiErrorResponse } from "./api-error-response.ts";
 
 const httpStatusByCode: Record<ErrorCode, number> = {
   [ErrorCode.resourceNotFound]: 404,
+  [ErrorCode.insufficientStock]: 409,
+  [ErrorCode.validationError]: 400,
   [ErrorCode.unknownError]: 500,
-  [ErrorCode.validationError]: 400
 };
 
 export const globalErrorHandler = (

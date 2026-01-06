@@ -1,4 +1,5 @@
 export const ErrorCode = {
+  insufficientStock: "insufficientStock",
   validationError: "validationError",
   resourceNotFound: "resourceNotFound",
   unknownError: "unknownError",

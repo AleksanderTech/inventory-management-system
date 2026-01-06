@@ -6,23 +6,29 @@ import type {
   GetProductsResponse,
   RestockProductRequest,
   RestockProductResponse,
+  SellProductRequest,
+  SellProductResponse,
 } from "./model/types.ts";
 import { CreateProductCommand } from "./commands/create-product-command.ts";
 import {
   validateCreateProduct,
   validateProductId,
   validateRestock,
+  validateSellProduct,
 } from "./validators/product-validator.ts";
 import { RestockProductCommand } from "./commands/restock-product-command.ts";
+import { SellProductCommand } from "./commands/sell-product-command.ts";
 
 export const productRouter = ({
   getProductsQuery,
   createProductCommand,
   restockProductCommand,
+  sellProductCommand,
 }: {
   getProductsQuery: GetProductsQuery;
   createProductCommand: CreateProductCommand;
   restockProductCommand: RestockProductCommand;
+  sellProductCommand: SellProductCommand;
 }) => {
   const router = Router();
 
@@ -33,8 +39,8 @@ export const productRouter = ({
 
   router.post("/products", async (req, res) => {
     const input = validateCreateProduct(req.body as CreateProductRequest);
-    const product = await createProductCommand.execute(input);
-    res.status(201).json(product satisfies CreateProductResponse);
+    const output = await createProductCommand.execute(input);
+    res.status(201).json(output satisfies CreateProductResponse);
   });
 
   router.post("/products/:id/restock", async (req, res) => {
@@ -42,6 +48,13 @@ export const productRouter = ({
     const productId = validateProductId(req.params.id);
     const output = await restockProductCommand.execute(productId, input.amount);
     res.json(output satisfies RestockProductResponse);
+  });
+
+  router.post("/products/:id/sell", async (req, res) => {
+    const input = validateSellProduct(req.body as SellProductRequest);
+    const productId = validateProductId(req.params.id);
+    const output = await sellProductCommand.execute(productId, input.amount);
+    res.json(output satisfies SellProductResponse);
   });
 
   return router;

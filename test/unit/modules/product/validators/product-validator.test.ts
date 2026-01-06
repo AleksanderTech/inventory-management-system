@@ -4,6 +4,7 @@ import {
   validateCreateProduct,
   validateProductId,
   validateRestock,
+  validateSellProduct,
 } from "../../../../../src/modules/product/validators/product-validator.ts";
 import { ProductCategory } from "../../../../../src/modules/shared/contracts/product/model/constants.ts";
 import { AppError } from "../../../../../src/modules/shared/error/app-error.ts";
@@ -72,6 +73,34 @@ describe("unit tests: product validation", () => {
       it(`rejects when ${name}`, () => {
         assert.throws(
           () => validateRestock(payload),
+          (error) => {
+            assert.ok(error instanceof AppError);
+            assert.equal(error.errorCode, ErrorCode.validationError);
+            return true;
+          }
+        );
+      });
+    }
+  });
+
+  describe("validateSellProduct", () => {
+    it("accepts valid payload", () => {
+      const result = validateSellProduct({ amount: 1 });
+      assert.deepStrictEqual(result, { amount: 1 });
+    });
+
+    const cases: { name: string; payload: unknown }[] = [
+      { name: "missing amount", payload: {} },
+      { name: "amount below min", payload: { amount: 0 } },
+      { name: "amount negative", payload: { amount: -1 } },
+      { name: "amount not integer", payload: { amount: 1.5 } },
+      { name: "amount not a number", payload: { amount: "amount" } },
+    ];
+
+    for (const { name, payload } of cases) {
+      it(`rejects when ${name}`, () => {
+        assert.throws(
+          () => validateSellProduct(payload),
           (error) => {
             assert.ok(error instanceof AppError);
             assert.equal(error.errorCode, ErrorCode.validationError);

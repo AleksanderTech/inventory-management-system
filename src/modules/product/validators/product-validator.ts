@@ -48,6 +48,8 @@ export function validateRestock(payload: unknown): RestockInput {
   return joiValidate<RestockInput>(restockSchema, payload);
 }
 
+export const validateSellProduct = validateRestock;
+
 export function validateProductId(payload: unknown): string {
   return joiValidate<string>(idSchema, payload);
 }

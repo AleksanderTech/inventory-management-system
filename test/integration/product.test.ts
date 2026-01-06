@@ -11,6 +11,8 @@ import type {
   GetProductsResponse,
   RestockProductRequest,
   RestockProductResponse,
+  SellProductRequest,
+  SellProductResponse,
 } from "../../src/modules/product/model/types.ts";
 import { ProductCategory } from "../../src/modules/shared/contracts/product/model/constants.ts";
 import { ErrorCode } from "../../src/modules/shared/error/error-code.ts";
@@ -174,6 +176,76 @@ describe("integration tests: products", () => {
     assert.equal(status, 404);
     assert.ok(body);
     assert.equal(body.errorCode, ErrorCode.resourceNotFound);
+    assert.ok(body.message);
+  });
+
+  it("sells product and returns updated stock", async () => {
+    const created = await createProduct(baseUrl, { stock: 5 });
+
+    const { status, body } = await requestJson<SellProductResponse>(
+      baseUrl,
+      Endpoint.sellProduct(created.id),
+      {
+        method: "POST",
+        body: { amount: 3 } satisfies SellProductRequest,
+      }
+    );
+
+    assert.equal(status, 200);
+    assert.ok(body);
+    assert.equal(body.productId, created.id);
+    assert.equal(body.stock, created.stock - 3);
+  });
+
+  it("rejects invalid sell payload", async () => {
+    const created = await createProduct(baseUrl);
+
+    const { status, body } = await requestJson<ApiErrorResponse>(
+      baseUrl,
+      Endpoint.sellProduct(created.id),
+      {
+        method: "POST",
+        body: { amount: 0 },
+      }
+    );
+
+    assert.equal(status, 400);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.validationError);
+    assert.ok(body.message);
+  });
+
+  it("returns not found when selling unknown product", async () => {
+    const { status, body } = await requestJson<ApiErrorResponse>(
+      baseUrl,
+      Endpoint.sellProduct(crypto.randomUUID()),
+      {
+        method: "POST",
+        body: { amount: 2 },
+      }
+    );
+
+    assert.equal(status, 404);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.resourceNotFound);
+    assert.ok(body.message);
+  });
+
+  it("rejects selling more than stock", async () => {
+    const created = await createProduct(baseUrl, { stock: 1 });
+
+    const { status, body } = await requestJson<ApiErrorResponse>(
+      baseUrl,
+      Endpoint.sellProduct(created.id),
+      {
+        method: "POST",
+        body: { amount: 2 },
+      }
+    );
+
+    assert.equal(status, 409);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.insufficientStock);
     assert.ok(body.message);
   });
 });

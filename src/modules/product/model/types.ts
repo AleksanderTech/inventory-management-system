@@ -32,6 +32,11 @@ export type RestockProductOutput = {
   stock: number;
 };
 
+export type SellProductOutput = {
+  productId: string;
+  stock: number;
+};
+
 export type RestockInput = {
   amount: number;
 };
@@ -42,3 +47,5 @@ export type CreateProductRequest = CreateProductInput;
 export type CreateProductResponse = CreateProductOutput;
 export type RestockProductRequest = RestockInput;
 export type RestockProductResponse = RestockProductOutput;
+export type SellProductRequest = RestockInput;
+export type SellProductResponse = RestockProductOutput
