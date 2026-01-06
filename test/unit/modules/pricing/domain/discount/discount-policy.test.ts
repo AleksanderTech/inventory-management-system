@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import {
   MainDiscountPolicy,
-} from "../../../../../src/modules/pricing/domain/discount/main-discount-policy.ts";
-import { DiscountReason } from "../../../../../src/modules/shared/contracts/pricing/model/constants.ts";
-import { ProductCategory } from "../../../../../src/modules/shared/contracts/product/model/constants.ts";
-import type { DiscountPolicyParams } from "../../../../../src/modules/shared/contracts/pricing/model/types.ts";
-import { DiscountRules } from "../../../../../src/modules/pricing/domain/discount/rules.ts";
-import { PolishBankHolidayMonthDays, HolidayDiscountCategoriesList } from "../../../../../src/modules/pricing/model/constants.ts";
+} from "../../../../../../src/modules/pricing/domain/discount/main-discount-policy.ts";
+import { DiscountReason } from "../../../../../../src/modules/shared/contracts/pricing/model/constants.ts";
+import { ProductCategory } from "../../../../../../src/modules/shared/contracts/product/model/constants.ts";
+import type { DiscountPolicyParams } from "../../../../../../src/modules/shared/contracts/pricing/model/types.ts";
+import { DiscountRules } from "../../../../../../src/modules/pricing/domain/discount/rules.ts";
+import { PolishBankHolidayMonthDays, HolidayDiscountCategoriesList } from "../../../../../../src/modules/pricing/model/constants.ts";
 
 describe("unit tests: MainDiscountPolicy", () => {
   const policy = new MainDiscountPolicy(DiscountRules);
