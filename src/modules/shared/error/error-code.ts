@@ -1,4 +1,5 @@
 export const ErrorCode = {
+  validationError: "validationError",
   resourceNotFound: "resourceNotFound",
   unknownError: "unknownError",
 } as const;
