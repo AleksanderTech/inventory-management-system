@@ -1,6 +1,6 @@
 import type { Knex } from "knex";
 
-export class SubtrackStockWriter {
+export class SubtractStockWriter {
   #db: Knex;
 
   constructor(db: Knex) {

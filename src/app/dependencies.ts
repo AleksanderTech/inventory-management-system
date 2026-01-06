@@ -3,7 +3,7 @@ import { GetProductsQuery } from "../modules/product/queries/get-products-query.
 import { CreateProductCommand } from "../modules/product/commands/create-product-command.ts";
 import { AddStockWriter } from "../modules/product/data/add-stock-writer.ts";
 import { RestockProductCommand } from "../modules/product/commands/restock-product-command.ts";
-import { SubtrackStockWriter } from "../modules/product/data/subtract-stock-writer.ts";
+import { SubtractStockWriter } from "../modules/product/data/subtract-stock-writer.ts";
 import { SellProductCommand } from "../modules/product/commands/sell-product-command.ts";
 import { MainCustomerReader } from "../modules/customer/data/main-customer-reader.ts";
 import { MainPriceCalculator } from "../modules/pricing/domain/main-price-calculator.ts";
@@ -19,8 +19,8 @@ export const createDependencies = async ({ db }: { db: Knex }) => {
   const createProductCommand = new CreateProductCommand(db);
   const addStockWriter = new AddStockWriter(db);
   const restockProductCommand = new RestockProductCommand(addStockWriter);
-  const subtrackStockWriter = new SubtrackStockWriter(db);
-  const sellProductCommand = new SellProductCommand(db, subtrackStockWriter);
+  const subtractStockWriter = new SubtractStockWriter(db);
+  const sellProductCommand = new SellProductCommand(db, subtractStockWriter);
   const mainCustomerReader = new MainCustomerReader(db);
   const mainProductsWithStockReader = new MainProductsWithStockReader(db);
   const orderWriter = new OrderWriter(db);
@@ -32,7 +32,7 @@ export const createDependencies = async ({ db }: { db: Knex }) => {
     orderPricing,
     mainCustomerReader,
     mainProductsWithStockReader,
-    subtrackStockWriter,
+    subtractStockWriter,
     orderWriter
   );
 

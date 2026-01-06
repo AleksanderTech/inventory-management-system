@@ -12,7 +12,7 @@ import {
   toOrderPricingParams,
   toOrderWriteParams,
 } from "./create-order-mappers.ts";
-import { SubtrackStockWriter } from "../../product/data/subtract-stock-writer.ts";
+import { SubtractStockWriter } from "../../product/data/subtract-stock-writer.ts";
 import { OrderWriter } from "../data/order-writer.ts";
 
 export class CreateOrderCommand {
@@ -20,7 +20,7 @@ export class CreateOrderCommand {
   #orderPricing: OrderPricing;
   #customerReader: CustomerReader;
   #productsReader: ProductsWithStockReader;
-  #substractStockWriter: SubtrackStockWriter;
+  #subtractStockWriter: SubtractStockWriter;
   #orderWriter: OrderWriter;
 
   constructor(
@@ -28,14 +28,14 @@ export class CreateOrderCommand {
     orderPricing: OrderPricing,
     customerReader: CustomerReader,
     productsReader: ProductsWithStockReader,
-    substractStockWriter: SubtrackStockWriter,
+    subtractStockWriter: SubtractStockWriter,
     orderWriter: OrderWriter
   ) {
     this.#db = db;
     this.#orderPricing = orderPricing;
     this.#customerReader = customerReader;
     this.#productsReader = productsReader;
-    this.#substractStockWriter = substractStockWriter;
+    this.#subtractStockWriter = subtractStockWriter;
     this.#orderWriter = orderWriter;
   }
 
@@ -89,7 +89,7 @@ export class CreateOrderCommand {
 
       // update stock
       for (const item of order.items) {
-        const updatedStock = await this.#substractStockWriter.subtractStock(
+        const updatedStock = await this.#subtractStockWriter.subtractStock(
           item.productId,
           item.quantity,
           nowMs,
