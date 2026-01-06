@@ -27,7 +27,18 @@ export type CreateProductOutput = {
   stock: number;
 };
 
+export type RestockProductOutput = {
+  productId: string;
+  stock: number;
+};
+
+export type RestockInput = {
+  amount: number;
+};
+
 // api
 export type GetProductsResponse = ProductView[];
 export type CreateProductRequest = CreateProductInput;
 export type CreateProductResponse = CreateProductOutput;
+export type RestockProductRequest = RestockInput;
+export type RestockProductResponse = RestockProductOutput;

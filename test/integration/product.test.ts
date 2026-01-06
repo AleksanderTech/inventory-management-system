@@ -9,11 +9,13 @@ import type {
   CreateProductRequest,
   CreateProductResponse,
   GetProductsResponse,
+  RestockProductRequest,
+  RestockProductResponse,
 } from "../../src/modules/product/model/types.ts";
 import { ProductCategory } from "../../src/modules/shared/contracts/product/model/constants.ts";
 import { ErrorCode } from "../../src/modules/shared/error/error-code.ts";
 import type { ApiErrorResponse } from "../../src/infra/express/error/api-error-response.ts";
-import { createProducts } from "./helpers/product-fixtures.ts";
+import { createProduct, createProducts } from "./helpers/product-fixtures.ts";
 
 describe("integration tests: products", () => {
   let server: Server;
@@ -68,7 +70,7 @@ describe("integration tests: products", () => {
       },
     });
 
-    assert.ok(status >= 400);
+    assert.equal(status, 400);
     assert.ok(body);
     assert.equal(body.errorCode, ErrorCode.validationError);
     assert.ok(body.message);
@@ -86,7 +88,7 @@ describe("integration tests: products", () => {
       },
     });
 
-    assert.ok(status >= 400);
+    assert.equal(status, 400);
     assert.ok(body);
     assert.equal(body.errorCode, ErrorCode.validationError);
     assert.ok(body.message);
@@ -121,5 +123,57 @@ describe("integration tests: products", () => {
     for (const product of created) {
       assert.deepStrictEqual(listedById.get(product.id), product);
     }
+  });
+
+  it("restocks product and returns updated stock", async () => {
+    const created = await createProduct(baseUrl);
+
+    const { status, body } = await requestJson<RestockProductResponse>(
+      baseUrl,
+      Endpoint.restockProduct(created.id),
+      {
+        method: "POST",
+        body: { amount: 3 } satisfies RestockProductRequest,
+      }
+    );
+
+    assert.equal(status, 200);
+    assert.ok(body);
+    assert.equal(body.productId, created.id);
+    assert.equal(body.stock, created.stock + 3);
+  });
+
+  it("rejects invalid restock payload", async () => {
+    const created = await createProduct(baseUrl);
+
+    const { status, body } = await requestJson<ApiErrorResponse>(
+      baseUrl,
+      Endpoint.restockProduct(created.id),
+      {
+        method: "POST",
+        body: { amount: 0 },
+      }
+    );
+
+    assert.equal(status, 400);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.validationError);
+    assert.ok(body.message);
+  });
+
+  it("returns not found when restocking unknown product", async () => {
+    const { status, body } = await requestJson<ApiErrorResponse>(
+      baseUrl,
+      Endpoint.restockProduct(crypto.randomUUID()),
+      {
+        method: "POST",
+        body: { amount: 2 },
+      }
+    );
+
+    assert.equal(status, 404);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.resourceNotFound);
+    assert.ok(body.message);
   });
 });
