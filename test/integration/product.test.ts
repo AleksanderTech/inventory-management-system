@@ -5,6 +5,15 @@ import type { Knex } from "knex";
 import { startTestServer, stopServer } from "./helpers/test-server.ts";
 import { requestJson } from "./helpers/request-json.ts";
 import { Endpoint } from "./helpers/endpoint.ts";
+import type {
+  CreateProductRequest,
+  CreateProductResponse,
+  GetProductsResponse,
+} from "../../src/modules/product/model/types.ts";
+import { ProductCategory } from "../../src/modules/shared/contracts/product/model/constants.ts";
+import { ErrorCode } from "../../src/modules/shared/error/error-code.ts";
+import type { ApiErrorResponse } from "../../src/infra/express/error/api-error-response.ts";
+import { createProducts } from "./helpers/product-fixtures.ts";
 
 describe("integration tests: products", () => {
   let server: Server;
@@ -19,12 +28,98 @@ describe("integration tests: products", () => {
     await stopServer(server, db);
   });
 
-  it("returns empty list", async () => {
-    const { status, body } = await requestJson<{ id: string }[]>(baseUrl, Endpoint.products, {
+  it("returns empty list on empty database", async () => {
+    const { status, body } = await requestJson<GetProductsResponse>(baseUrl, Endpoint.products, {
       method: "GET",
     });
 
     assert.equal(status, 200);
     assert.equal(body?.length, 0);
+  });
+
+  it("creates product and returns it", async () => {
+    const payload: CreateProductRequest = {
+      name: "Cappuccino Mug",
+      description: "Wide mug",
+      category: ProductCategory.mugs,
+      priceMinor: 1599,
+      stock: 7,
+    };
+
+    const { status, body } = await requestJson<CreateProductResponse>(baseUrl, Endpoint.products, {
+      method: "POST",
+      body: payload,
+    });
+
+    assert.equal(status, 201);
+    assert.ok(body);
+    assert.equal(body.name, payload.name);
+    assert.equal(body.description, payload.description);
+    assert.equal(body.category, payload.category);
+    assert.equal(body.priceMinor, payload.priceMinor);
+    assert.equal(body.stock, payload.stock);
+  });
+
+  it("rejects invalid product payload", async () => {
+    const { status, body } = await requestJson<ApiErrorResponse>(baseUrl, Endpoint.products, {
+      method: "POST",
+      body: {
+        name: "Missing fields",
+      },
+    });
+
+    assert.ok(status >= 400);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.validationError);
+    assert.ok(body.message);
+  });
+
+  it("rejects invalid numeric values", async () => {
+    const { status, body } = await requestJson<ApiErrorResponse>(baseUrl, Endpoint.products, {
+      method: "POST",
+      body: {
+        name: "Bad numbers",
+        description: "Invalid price and stock",
+        category: ProductCategory.mugs,
+        priceMinor: 0,
+        stock: -1,
+      },
+    });
+
+    assert.ok(status >= 400);
+    assert.ok(body);
+    assert.equal(body.errorCode, ErrorCode.validationError);
+    assert.ok(body.message);
+  });
+
+  it("creates products and returns them", async () => {
+    const created = await createProducts(baseUrl, [
+      {
+        name: "Great Mug",
+      },
+      {
+        name: "Espresso Beans",
+        description: "Dark roast",
+        category: ProductCategory.coffee,
+        priceMinor: 2499,
+        stock: 5,
+      },
+    ]);
+
+    const { status: listStatus, body: listBody } = await requestJson<GetProductsResponse>(
+      baseUrl,
+      Endpoint.products,
+      { method: "GET" }
+    );
+
+    assert.equal(listStatus, 200);
+    assert.ok(listBody);
+    assert.equal(listBody.length, created.length);
+
+    const listedById = new Map(listBody.map((product) => [product.id, product]));
+
+    for (const product of created) {
+      assert.deepStrictEqual(listedById.get(product.id), product);
+    }
   });
 });
