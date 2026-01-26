@@ -1,0 +1,37 @@
+{
+  "name": "inventory-management-system",
+  "version": "1.0.0",
+  "description": "Inventory Management System",
+  "main": "src/app/index.ts",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "npm run migrate-up && node --env-file=.env.development --watch-path=./src ./src/app/index.ts",
+    "start": "npm run migrate-up && node --env-file=.env.development ./src/app/index.ts",
+    "migrate-up": "npx knex migrate:latest --knexfile ./knexfile-cli.js --migrations-directory db/migrations",
+    "migrate-down": "npx knex migrate:down --knexfile ./knexfile-cli.js --migrations-directory db/migrations",
+    "make-migration": "npx knex migrate:make --knexfile ./knexfile-cli.js --migrations-directory db/migrations",
+    "test": "npm run test-unit && npm run test-integration",
+    "test-integration": "node --test --test-concurrency=1 \"test/integration/**/*.test.ts\"",
+    "test-unit": "node --test \"test/unit/**/*.test.ts\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AleksanderTech/inventory-management-system.git"
+  },
+  "bugs": {
+    "url": "https://github.com/AleksanderTech/inventory-management-system/issues"
+  },
+  "homepage": "https://github.com/AleksanderTech/inventory-management-system#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.5.0",
+    "express": "^5.2.1",
+    "joi": "^18.0.2",
+    "knex": "^3.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6"
+  }
+}
